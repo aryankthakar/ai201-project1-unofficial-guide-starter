@@ -110,29 +110,7 @@ chars/chunk.
      You can use ASCII art, a Mermaid diagram, or embed a sketch as an image.
      You'll use this diagram as context when prompting AI tools to implement each stage. -->
 
-```mermaid
-flowchart TB
-    subgraph INDEX["Indexing (offline) — run scrape.py then retriever.py"]
-        direction TB
-        S["sources.py<br/>11 sources"] --> SC["scrape.py"]
-        L["Saved HTML<br/>documents/raw/*.html"] --> SC
-        SC --> CL["Clean & convert<br/>BeautifulSoup strip + markdownify"]
-        CL --> MD["documents/*.md<br/>(source + url front-matter)"]
-        MD --> IG["ingest.py<br/>sliding-window chunk<br/>400 chars / 75 overlap"]
-        IG --> EM["retriever.embed_and_store<br/>all-MiniLM-L6-v2 (384-dim)"]
-        EM --> DB[("ChromaDB<br/>cosine, persistent<br/>356 chunks")]
-    end
-
-    subgraph QUERY["Query (online) — app.py"]
-        direction TB
-        Q["User query<br/>Gradio ChatInterface"] --> R["retriever.retrieve<br/>top-k=4, distance ≤ 0.7"]
-        R --> DB
-        DB --> CTX["Retrieved chunks<br/>+ source metadata"]
-        CTX --> GEN["generator.generate_response<br/>Groq llama-3.3-70b-versatile<br/>grounded + balanced + cited"]
-        Q --> GEN
-        GEN --> ANS["Answer + Sources list"]
-    end
-```
+![](RAG-pipeline.png)
 
 **Stage → tool mapping**
 
