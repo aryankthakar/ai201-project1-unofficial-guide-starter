@@ -39,22 +39,14 @@ My ideas so far are UMD housing reviews (specifically of University View, so tha
 ## Chunking Strategy
 
 <!-- How will you split documents into chunks?
-     State your chunk size (in tokens or characters), overlap size, and explain why those
-     numbers fit the structure of your documents.
+     State your chunk size (in tokens or characters), overlap size, and explain why those numbers fit the structure of your documents.
      A review-heavy corpus warrants different chunking than a long FAQ. -->
 
 **Chunk size:** 400 characters
 
 **Overlap:** 75 characters (min chunk length 50; shorter fragments discarded)
 
-**Reasoning:** Uniform character-based sliding window. The corpus is
-review-heavy — reviews, Reddit comments, and FAQ answers each pack one opinion
-or one fact into a short span, so small chunks keep every retrieved unit focused
-on a single perspective instead of blurring several together. 400 chars also
-stays under all-MiniLM-L6-v2's ~256-token (~1000-char) limit, so no chunk is
-silently truncated at embed time. The 75-char overlap protects facts that
-straddle a boundary. Result on the 6 ingested sources: 254 chunks, avg 395
-chars/chunk.
+**Reasoning:** Uniform character-based sliding window. The corpus is review-heavy. Reviews, Reddit comments, and FAQ answers each pack one opinion or one fact into a short span, so small chunks keep every retrieved unit focused on a single perspective instead of blurring several together. 400 chars also stays under all-MiniLM-L6-v2's ~256-token (~1000-char) limit, so no chunk is silently truncated at embed time. The 75-char overlap protects facts that straddle a boundary. Result on the 6 ingested sources: 254 chunks, avg 395 chars/chunk.
 
 ---
 

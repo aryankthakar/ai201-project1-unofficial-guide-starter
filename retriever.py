@@ -110,8 +110,31 @@ def retrieve(query: str, n_results: int = N_RESULTS,
     return results
 
 
+def _probe(query: str) -> None:
+    """Print the chunks a query retrieves: raw top-k vs. what passes the filter.
+
+    Shows the cosine distance, source, and full text of each chunk so you can
+    judge chunking quality and calibrate MAX_DISTANCE.
+    """
+    from config import MAX_DISTANCE, N_RESULTS
+    raw = retrieve(query, n_results=N_RESULTS, max_distance=99)  # unfiltered
+    rule = "─" * 80
+    print(f"\nQuery: {query!r}")
+    print(f"Top-{N_RESULTS} chunks (filter keeps distance <= {MAX_DISTANCE}):\n")
+    for r in raw:
+        kept = "KEEP" if r["distance"] <= MAX_DISTANCE else "drop"
+        print(rule)
+        print(f"[{kept}] dist={r['distance']:.3f}  source={r['source']}")
+        print(r["text"])
+        print(rule + "\n")
+
+
 if __name__ == "__main__":
-    index_corpus(reset=True)
-    print("\n--- smoke test: 'how close is it to campus?' ---")
-    for r in retrieve("how close is it to campus?"):
-        print(f"[{r['distance']:.3f}] {r['source']}: {r['text'][:120]}")
+    import sys
+    if len(sys.argv) > 1:
+        # Probe a specific query without rebuilding the index:
+        #   python retriever.py "what are the downsides?"
+        _probe(" ".join(sys.argv[1:]))
+    else:
+        # No args: (re)build the index from documents/.
+        index_corpus(reset=True)
